@@ -8,18 +8,19 @@ from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet
-
+from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 #all in one
 class NoteViewSet(ModelViewSet):
     # queryset = Note.objects.all()
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
-    http_method_names = ['get','post']
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    # http_method_names = ['get','post']
 
     def list(self, request, *args, **kwargs):
 
-        # notes = Note.objects.all()
-        notes = Note.objects.filter(author=request.user.id)
+        notes = Note.objects.all()
+        # notes = Note.objects.filter(author=request.user.id)
         context = {'request': request}
         serializer = ThisNoteSerializer(notes, many=True, context=context)
         return Response(serializer.data)
