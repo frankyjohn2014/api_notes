@@ -1,6 +1,6 @@
 from django.db.models import(EmailField,CharField,BooleanField, DateTimeField)
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password,identify_hasher
 
 
 class UserManager(BaseUserManager):
@@ -78,7 +78,13 @@ class User(AbstractBaseUser):
     def is_admin(self):
         return self.admin
 
+
+#save user with check hash
     def save(self, *args, **kwargs):
-        if not self.id and not self.staff and not self.admin:
+        try:
+            _alg = identify_hasher(self.password)
+        except ValueError:
             self.password = make_password(self.password)
         super().save(*args, **kwargs)
+        # if not self.id and not self.staff and not self.admin:
+
